@@ -7,6 +7,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+
+<!-- Firebase Compat SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
 <style>
 
 /* ══════════════════════════════════════════════
@@ -952,19 +957,53 @@ body {
 ══════════════════════════════════════════════ -->
 <script>
 // ============================================
-// DATA STORAGE - Using LocalStorage
+// FIREBASE SETUP
+// ============================================
+const firebaseConfig = {
+  apiKey: "AIzaSyANSfgSzpJp9enhkVuFBg8iy1J25UqDpV8",
+  authDomain: "online-d6e7e.firebaseapp.com",
+  databaseURL: "https://online-d6e7e-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "online-d6e7e",
+  storageBucket: "online-d6e7e.firebasestorage.app",
+  messagingSenderId: "183360302486",
+  appId: "1:183360302486:web:80e14cd62126663bad01b7",
+  measurementId: "G-14F8RBCZ04"
+};
+firebase.initializeApp(firebaseConfig);
+const _db = firebase.database();
+try { firebase.analytics(); } catch(e) {}
+
+// ============================================
+// DATA STORAGE - Firebase Realtime Database
 // ============================================
 const ADMIN_EMAIL = "virendrajangid081@gmail.com";
 const ADMIN_PASSWORD = "Edith@9.6";
 
-function getData() {
-  return {
-    batches: JSON.parse(localStorage.getItem('batches') || '{}'),
-    students: JSON.parse(localStorage.getItem('students') || '{}')
+// In-memory cache — updated live via onValue listener
+let _appData = { batches: {}, students: {} };
+
+// Listen to ALL data in real-time (syncs across all devices)
+_db.ref('/').on('value', snapshot => {
+  const val = snapshot.val() || {};
+  _appData = {
+    batches:  val.batches  || {},
+    students: val.students || {}
   };
+});
+
+function getData() {
+  return _appData;
 }
-function saveBatches(b) { localStorage.setItem('batches', JSON.stringify(b)); }
-function saveStudents(s) { localStorage.setItem('students', JSON.stringify(s)); }
+
+async function saveBatches(b) {
+  _appData.batches = b;
+  await _db.ref('batches').set(b);
+}
+
+async function saveStudents(s) {
+  _appData.students = s;
+  await _db.ref('students').set(s);
+}
 
 // ============================================
 // LOGIN SYSTEM
@@ -1119,16 +1158,16 @@ async function saveBatch() {
     name, photoUrl, description,
     subjects: data.batches[id]?.subjects || {}
   };
-  saveBatches(data.batches);
+  await saveBatches(data.batches);
   closeModal('batchModal');
   loadBatches();
 }
 
-function deleteBatch(id) {
+async function deleteBatch(id) {
   if (!confirm('Delete this batch and all its content?')) return;
   const data = getData();
   delete data.batches[id];
-  saveBatches(data.batches);
+  await saveBatches(data.batches);
   loadBatches();
 }
 
@@ -1202,16 +1241,16 @@ async function saveSubject() {
     name, photoUrl,
     content: existing.content || { video: {}, pdf: {}, notes: {}, dpp: {}, dppVideo: {} }
   };
-  saveBatches(data.batches);
+  await saveBatches(data.batches);
   closeModal('subjectModal');
   manageSubjects(currentBatchId);
 }
 
-function deleteSubject(id) {
+async function deleteSubject(id) {
   if (!confirm('Delete this subject?')) return;
   const data = getData();
   delete data.batches[currentBatchId].subjects[id];
-  saveBatches(data.batches);
+  await saveBatches(data.batches);
   manageSubjects(currentBatchId);
 }
 
@@ -1318,16 +1357,16 @@ async function saveContent() {
   
   const id = editingContentId || 'cnt_' + Date.now();
   subject.content[currentContentType][id] = { title, url };
-  saveBatches(data.batches);
+  await saveBatches(data.batches);
   closeModal('contentModal');
   manageContentType(currentContentType);
 }
 
-function deleteContent(id) {
+async function deleteContent(id) {
   if (!confirm('Delete this item?')) return;
   const data = getData();
   delete data.batches[currentBatchId].subjects[currentSubjectId].content[currentContentType][id];
-  saveBatches(data.batches);
+  await saveBatches(data.batches);
   manageContentType(currentContentType);
 }
 
@@ -1395,7 +1434,7 @@ function openStudentModal(studentId = null) {
   openModal('studentModal');
 }
 
-function saveStudent() {
+async function saveStudent() {
   const id = document.getElementById('newStudentId').value.trim();
   const name = document.getElementById('newStudentName').value.trim();
   const password = document.getElementById('newStudentPassword').value.trim();
@@ -1409,16 +1448,16 @@ function saveStudent() {
   
   const batches = [...document.querySelectorAll('#batchCheckboxes input:checked')].map(c => c.value);
   data.students[id] = { name, password, batches };
-  saveStudents(data.students);
+  await saveStudents(data.students);
   closeModal('studentModal');
   loadStudents();
 }
 
-function deleteStudent(id) {
+async function deleteStudent(id) {
   if (!confirm('Remove this student?')) return;
   const data = getData();
   delete data.students[id];
-  saveStudents(data.students);
+  await saveStudents(data.students);
   loadStudents();
 }
 
@@ -1531,30 +1570,13 @@ function studentViewContent(batchId, subjectId, type) {
 // AUTO-LOGIN ON RELOAD
 // ============================================
 window.onload = function() {
-  const userType = sessionStorage.getItem('userType');
-  if (userType === 'admin') showAdminPanel();
-  else if (userType === 'student') showStudentPanel();
+  // Wait for Firebase to load data before restoring session
+  _db.ref('/').once('value', () => {
+    const userType = sessionStorage.getItem('userType');
+    if (userType === 'admin') showAdminPanel();
+    else if (userType === 'student') showStudentPanel();
+  });
 };
-</script>
-
-<!-- Firebase SDK -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyANSfgSzpJp9enhkVuFBg8iy1J25UqDpV8",
-    authDomain: "online-d6e7e.firebaseapp.com",
-    databaseURL: "https://online-d6e7e-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "online-d6e7e",
-    storageBucket: "online-d6e7e.firebasestorage.app",
-    messagingSenderId: "183360302486",
-    appId: "1:183360302486:web:80e14cd62126663bad01b7",
-    measurementId: "G-14F8RBCZ04"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
 </script>
 </body>
 </html>
