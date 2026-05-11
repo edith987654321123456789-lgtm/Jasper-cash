@@ -1536,5 +1536,25 @@ window.onload = function() {
   else if (userType === 'student') showStudentPanel();
 };
 </script>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyANSfgSzpJp9enhkVuFBg8iy1J25UqDpV8",
+    authDomain: "online-d6e7e.firebaseapp.com",
+    databaseURL: "https://online-d6e7e-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "online-d6e7e",
+    storageBucket: "online-d6e7e.firebasestorage.app",
+    messagingSenderId: "183360302486",
+    appId: "1:183360302486:web:80e14cd62126663bad01b7",
+    measurementId: "G-14F8RBCZ04"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
 </body>
 </html>
