@@ -778,6 +778,78 @@ body {
 }
 
 /* ══════════════════════════════════════════════
+   SESSION KICKED OVERLAY
+══════════════════════════════════════════════ */
+.kicked-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26,29,59,0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn .25s ease;
+}
+
+.kicked-box {
+  background: var(--white);
+  padding: 40px 36px;
+  border-radius: 20px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+  animation: modalUp .3s cubic-bezier(.4,0,.2,1);
+}
+
+.kicked-box .icon-circle {
+  width: 76px; height: 76px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  background: var(--red-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 38px;
+}
+
+.kicked-box h3 {
+  font-family: 'Poppins', sans-serif;
+  color: var(--red);
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.kicked-box p {
+  color: var(--text2);
+  font-size: 14.5px;
+  line-height: 1.6;
+  margin-bottom: 22px;
+}
+
+.kicked-box button {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-mid));
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(79,70,229,0.25);
+  transition: var(--trans);
+}
+
+.kicked-box button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(79,70,229,0.32);
+}
+
+/* ══════════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════════ */
 @media (max-width: 768px) {
@@ -953,7 +1025,19 @@ body {
 </div>
 
 <!-- ══════════════════════════════════════════════
-     JAVASCRIPT — EXACTLY SAME AS ORIGINAL
+     SESSION KICKED OVERLAY
+══════════════════════════════════════════════ -->
+<div id="kickedOverlay" class="kicked-overlay hidden">
+  <div class="kicked-box">
+    <div class="icon-circle">🚫</div>
+    <h3>Session Ended</h3>
+    <p>Aapki Student ID kisi aur device par login ho gayi hai. Ek time par sirf ek hi device par login kiya jaa sakta hai.</p>
+    <button onclick="closeKickedOverlay()">OK, Go to Login</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     JAVASCRIPT
 ══════════════════════════════════════════════ -->
 <script>
 // ============================================
@@ -1006,6 +1090,82 @@ async function saveStudents(s) {
 }
 
 // ============================================
+// SINGLE-DEVICE LOGIN SYSTEM
+// ============================================
+// Har student ke login pe ek unique session token Firebase me save hota hai.
+// Yeh device us token ko continuously watch karta hai.
+// Agar koi dusra device same ID se login karega -> token change hoga -> yeh device automatically logout ho jayega.
+
+let _sessionListenerRef = null;   // Firebase listener reference
+let _isKickedOut = false;         // Flag to avoid duplicate alerts
+
+function generateSessionToken() {
+  // Unique random token (timestamp + random)
+  return 'tok_' + Date.now() + '_' + Math.random().toString(36).substring(2, 12);
+}
+
+// Start watching this device's session token in Firebase
+function startSessionWatcher(studentId, myToken) {
+  // Stop any previous listener
+  stopSessionWatcher();
+
+  _sessionListenerRef = _db.ref('sessions/' + studentId);
+  _sessionListenerRef.on('value', snapshot => {
+    const serverData = snapshot.val();
+
+    // If no session exists OR token has changed -> kicked out
+    if (!serverData || serverData.token !== myToken) {
+      if (!_isKickedOut) {
+        _isKickedOut = true;
+        handleKickedOut();
+      }
+    }
+  });
+}
+
+function stopSessionWatcher() {
+  if (_sessionListenerRef) {
+    _sessionListenerRef.off();
+    _sessionListenerRef = null;
+  }
+}
+
+// When this device is forcibly logged out by another login
+function handleKickedOut() {
+  stopSessionWatcher();
+  sessionStorage.clear();
+
+  // Hide all panels
+  document.getElementById('adminPanel').classList.add('hidden');
+  document.getElementById('studentPanel').classList.add('hidden');
+  document.getElementById('loginPage').classList.remove('hidden');
+
+  // Show overlay
+  document.getElementById('kickedOverlay').classList.remove('hidden');
+}
+
+function closeKickedOverlay() {
+  document.getElementById('kickedOverlay').classList.add('hidden');
+  _isKickedOut = false;
+}
+
+// On normal logout — also remove the session from Firebase
+async function clearMySessionFromFirebase() {
+  const studentId = sessionStorage.getItem('studentId');
+  const myToken   = sessionStorage.getItem('sessionToken');
+  if (!studentId || !myToken) return;
+
+  try {
+    // Only delete if this device still owns the token
+    const snap = await _db.ref('sessions/' + studentId).once('value');
+    const data = snap.val();
+    if (data && data.token === myToken) {
+      await _db.ref('sessions/' + studentId).remove();
+    }
+  } catch(e) { console.warn(e); }
+}
+
+// ============================================
 // LOGIN SYSTEM
 // ============================================
 function showTab(tab, evt) {
@@ -1027,20 +1187,50 @@ function adminLogin() {
   }
 }
 
-function studentLogin() {
-  const id = document.getElementById('studentLoginId').value;
+async function studentLogin() {
+  const id = document.getElementById('studentLoginId').value.trim();
   const password = document.getElementById('studentLoginPassword').value;
   const data = getData();
-  if (data.students[id] && data.students[id].password === password) {
-    sessionStorage.setItem('userType', 'student');
-    sessionStorage.setItem('studentId', id);
-    showStudentPanel();
-  } else {
+
+  if (!data.students[id] || data.students[id].password !== password) {
     document.getElementById('errorMsg').textContent = '❌ Invalid student credentials!';
+    return;
   }
+
+  // ====== Single-device login enforcement ======
+  // 1. Generate a brand new unique token for THIS device
+  // 2. Overwrite the session in Firebase
+  //    -> Any other device that was logged in will detect the token change
+  //       and will be force-logged-out automatically.
+  const newToken = generateSessionToken();
+
+  try {
+    await _db.ref('sessions/' + id).set({
+      token: newToken,
+      loginTime: Date.now(),
+      device: navigator.userAgent.substring(0, 80)
+    });
+  } catch(e) {
+    document.getElementById('errorMsg').textContent = '❌ Login failed. Try again.';
+    return;
+  }
+
+  // Save my session locally
+  sessionStorage.setItem('userType', 'student');
+  sessionStorage.setItem('studentId', id);
+  sessionStorage.setItem('sessionToken', newToken);
+
+  _isKickedOut = false;
+  showStudentPanel();
 }
 
-function logout() {
+async function logout() {
+  // If student is logging out -> remove session from Firebase
+  if (sessionStorage.getItem('userType') === 'student') {
+    await clearMySessionFromFirebase();
+  }
+  stopSessionWatcher();
+
   sessionStorage.clear();
   document.getElementById('loginPage').classList.remove('hidden');
   document.getElementById('adminPanel').classList.add('hidden');
@@ -1061,10 +1251,21 @@ function showStudentPanel() {
   document.getElementById('loginPage').classList.add('hidden');
   document.getElementById('studentPanel').classList.remove('hidden');
   const id = sessionStorage.getItem('studentId');
+  const myToken = sessionStorage.getItem('sessionToken');
   const data = getData();
   document.getElementById('studentNameDisplay').textContent = data.students[id].name;
+
+  // Start the session watcher
+  if (id && myToken) startSessionWatcher(id, myToken);
+
   showStudentBatches();
 }
+
+// When user closes/refreshes the tab — don't auto-clear the session (we want it to persist)
+// But you can uncomment below if you want auto-logout on tab close:
+// window.addEventListener('beforeunload', () => {
+//   if (sessionStorage.getItem('userType') === 'student') clearMySessionFromFirebase();
+// });
 
 // ============================================
 // MODAL HELPERS
@@ -1395,9 +1596,21 @@ function loadStudents() {
       <p><b>Password:</b> ${s.password}</p>
       <p><b>Batches:</b> ${batchNames || 'None'}</p>
       <button onclick="openStudentModal('${id}')">✏️ Edit</button>
+      <button class="danger" onclick="forceLogoutStudent('${id}')">🔌 Force Logout</button>
       <button class="danger" onclick="deleteStudent('${id}')">🗑️ Remove</button>
     </div>`;
   });
+}
+
+// Admin can forcefully log out a student from all devices
+async function forceLogoutStudent(id) {
+  if (!confirm('Force logout this student from all devices?')) return;
+  try {
+    await _db.ref('sessions/' + id).remove();
+    alert('✅ Student has been logged out from all devices.');
+  } catch(e) {
+    alert('❌ Failed to logout student.');
+  }
 }
 
 function openStudentModal(studentId = null) {
@@ -1458,6 +1671,8 @@ async function deleteStudent(id) {
   const data = getData();
   delete data.students[id];
   await saveStudents(data.students);
+  // Also remove their active session
+  try { await _db.ref('sessions/' + id).remove(); } catch(e) {}
   loadStudents();
 }
 
@@ -1573,8 +1788,30 @@ window.onload = function() {
   // Wait for Firebase to load data before restoring session
   _db.ref('/').once('value', () => {
     const userType = sessionStorage.getItem('userType');
-    if (userType === 'admin') showAdminPanel();
-    else if (userType === 'student') showStudentPanel();
+    if (userType === 'admin') {
+      showAdminPanel();
+    } else if (userType === 'student') {
+      const studentId = sessionStorage.getItem('studentId');
+      const myToken   = sessionStorage.getItem('sessionToken');
+
+      if (!studentId || !myToken) {
+        sessionStorage.clear();
+        return;
+      }
+
+      // Verify our token is still the active one in Firebase
+      _db.ref('sessions/' + studentId).once('value').then(snap => {
+        const data = snap.val();
+        if (data && data.token === myToken) {
+          // Valid session — show panel
+          showStudentPanel();
+        } else {
+          // Session expired / replaced by another device
+          sessionStorage.clear();
+          document.getElementById('kickedOverlay').classList.remove('hidden');
+        }
+      });
+    }
   });
 };
 </script>
