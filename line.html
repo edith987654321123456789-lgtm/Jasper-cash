@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduPeak — Online Coaching Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+
+/* ══════════════════════════════════════════════
+   ROOT VARIABLES
+══════════════════════════════════════════════ */
+:root {
+  --primary:       #4F46E5;
+  --primary-dark:  #3730A3;
+  --primary-light: #EEF2FF;
+  --primary-mid:   #6366F1;
+  --accent:        #F97316;
+  --accent-light:  #FFF7ED;
+  --green:         #10B981;
+  --green-light:   #ECFDF5;
+  --red:           #EF4444;
+  --red-light:     #FEF2F2;
+  --yellow:        #F59E0B;
+  --yellow-light:  #FFFBEB;
+
+  --bg:            #F5F6FA;
+  --bg2:           #ECEEF5;
+  --white:         #FFFFFF;
+  --border:        #E2E5F0;
+  --border2:       #D1D5E8;
+
+  --text:          #1A1D3B;
+  --text2:         #4B5280;
+  --text3:         #9BA3C7;
+
+  --sidebar-bg:    #1A1D3B;
+  --sidebar-hover: #262B50;
+  --sidebar-act:   #4F46E5;
+
+  --navbar-bg:     #1A1D3B;
+
+  --radius:        14px;
+  --radius-sm:     8px;
+  --radius-xs:     6px;
+  --shadow:        0 4px 24px rgba(79,70,229,0.10);
+  --shadow-md:     0 8px 32px rgba(26,29,59,0.13);
+  --shadow-sm:     0 2px 10px rgba(26,29,59,0.07);
+  --trans:         all .2s cubic-bezier(.4,0,.2,1);
+}
+
+/* ══════════════════════════════════════════════
+   BASE RESET
+══════════════════════════════════════════════ */
+*, *::before, *::after {
+  margin: 0; padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.hidden { display: none !important; }
+
+/* ══════════════════════════════════════════════
+   LOGIN PAGE
+══════════════════════════════════════════════ */
+#loginPage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 0%, rgba(79,70,229,0.13) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 90% 100%, rgba(249,115,22,0.10) 0%, transparent 60%),
+    linear-gradient(160deg, #F0F1F9 0%, #ECEEF5 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* decorative blobs */
+#loginPage::before {
+  content:'';
+  position:absolute; width:420px; height:420px; border-radius:50%;
+  background: radial-gradient(circle, rgba(79,70,229,0.07), transparent 70%);
+  top:-80px; left:-80px; pointer-events:none;
+}
+#loginPage::after {
+  content:'';
+  position:absolute; width:320px; height:320px; border-radius:50%;
+  background: radial-gradient(circle, rgba(249,115,22,0.07), transparent 70%);
+  bottom:-60px; right:-60px; pointer-events:none;
+}
+
+.login-container {
+  max-width: 460px;
+  width: 100%;
+  background: var(--white);
+  padding: 44px 40px;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(79,70,229,0.14), 0 2px 8px rgba(26,29,59,0.06);
+  border: 1px solid rgba(79,70,229,0.08);
+  position: relative;
+  animation: loginUp .5s cubic-bezier(.4,0,.2,1) both;
+}
+
+@keyframes loginUp {
+  from { opacity:0; transform:translateY(28px) scale(0.98); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+
+/* Logo area */
+.login-container h1 {
+  text-align: center;
+  color: var(--primary);
+  margin-bottom: 28px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.login-logo-ring {
+  width: 64px; height: 64px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-mid));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 8px 24px rgba(79,70,229,0.28);
+}
+
+/* Tabs */
+.login-tabs {
+  display: flex;
+  background: var(--bg2);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 24px;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Nunito', sans-serif;
+  color: var(--text2);
+  border-radius: 7px;
+  transition: var(--trans);
+}
+
+.tab-btn.active {
+  background: var(--white);
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Login form */
+.login-form { display: none; }
+.login-form.active { display: block; animation: fadeIn .22s ease; }
+
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+.login-form h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 18px;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 13px 16px;
+  margin: 7px 0;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: 'Nunito', sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  transition: var(--trans);
+}
+
+.login-form input:focus {
+  border-color: var(--primary);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(79,70,229,0.09);
+}
+
+.login-form input::placeholder { color: var(--text3); }
+
+.login-form button {
+  width: 100%;
+  padding: 13px;
+  margin-top: 14px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-mid));
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+  transition: var(--trans);
+  box-shadow: 0 4px 16px rgba(79,70,229,0.25);
+}
+
+.login-form button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(79,70,229,0.32);
+}
+
+.error {
+  color: var(--red);
+  text-align: center;
+  margin-top: 14px;
+  min-height: 20px;
+  font-size: 13.5px;
+  font-weight: 600;
+  background: var(--red-light);
+  border-radius: var(--radius-xs);
+  padding: 8px 12px;
+  display: none;
+}
+
+.error:not(:empty) { display: block; }
+
+.success {
+  color: var(--green);
+  text-align: center;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+/* ══════════════════════════════════════════════
+   NAVBAR
+══════════════════════════════════════════════ */
+.navbar {
+  background: var(--navbar-bg);
+  color: white;
+  padding: 0 28px;
+  height: 62px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 16px rgba(26,29,59,0.22);
+  position: sticky; top: 0; z-index: 200;
+}
+
+.navbar h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar h2 span {
+  color: #FFD580;
+}
+
+.navbar > button {
+  padding: 8px 20px;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.85);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: 'Nunito', sans-serif;
+  transition: var(--trans);
+}
+
+.navbar > button:hover {
+  background: rgba(239,68,68,0.25);
+  border-color: rgba(239,68,68,0.4);
+  color: #fca5a5;
+}
+
+/* ══════════════════════════════════════════════
+   ADMIN PANEL LAYOUT
+══════════════════════════════════════════════ */
+.admin-container {
+  display: flex;
+  min-height: calc(100vh - 62px);
+}
+
+.sidebar {
+  width: 230px;
+  background: var(--sidebar-bg);
+  padding: 22px 14px;
+  min-height: 100vh;
+  flex-shrink: 0;
+}
+
+.sidebar button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 4px;
+  background: transparent;
+  color: rgba(255,255,255,0.60);
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Nunito', sans-serif;
+  transition: var(--trans);
+  letter-spacing: 0.1px;
+}
+
+.sidebar button:hover {
+  background: var(--sidebar-hover);
+  color: rgba(255,255,255,0.90);
+}
+
+.sidebar button.active {
+  background: var(--sidebar-act);
+  color: white;
+  box-shadow: 0 4px 16px rgba(79,70,229,0.35);
+}
+
+.content-area {
+  flex: 1;
+  padding: 32px 30px;
+  background: var(--bg);
+  overflow-x: hidden;
+}
+
+.section { display: none; }
+.section.active { display: block; animation: fadeIn .22s ease; }
+.section h2 {
+  color: var(--text);
+  margin-bottom: 20px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ══════════════════════════════════════════════
+   ACTION BUTTONS
+══════════════════════════════════════════════ */
+.add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 22px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-mid));
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  margin: 0 0 22px 0;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+  transition: var(--trans);
+  box-shadow: 0 4px 14px rgba(79,70,229,0.22);
+}
+
+.add-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(79,70,229,0.30);
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--white);
+  color: var(--text2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  margin-right: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: 'Nunito', sans-serif;
+  transition: var(--trans);
+  box-shadow: var(--shadow-sm);
+}
+
+.back-btn:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* ══════════════════════════════════════════════
+   CARDS
+══════════════════════════════════════════════ */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: var(--white);
+  padding: 0;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  border: 1.5px solid var(--border);
+  transition: var(--trans);
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(79,70,229,0.25);
+}
+
+/* card inner padding (for cards without image) */
+.card > h3,
+.card > p,
+.card > button,
+.card > a {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.card > h3:first-child { padding-top: 18px; }
+.card > *:last-child   { padding-bottom: 16px; }
+
+.card img {
+  width: 100%;
+  height: 165px;
+  object-fit: cover;
+  border-radius: 0;
+  background: var(--bg2);
+  display: block;
+}
+
+.card h3 {
+  margin: 14px 0 6px;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+}
+
+.card p {
+  color: var(--text2);
+  font-size: 13.5px;
+  margin-bottom: 12px;
+  line-height: 1.55;
+}
+
+/* card button row */
+.card-btn-row {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  padding: 0 16px 16px;
+}
+
+.card button {
+  padding: 7px 14px;
+  margin: 4px 2px;
+  border: none;
+  border-radius: 7px;
+  background: var(--primary-light);
+  color: var(--primary);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+  transition: var(--trans);
+}
+
+.card button:hover {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 3px 10px rgba(79,70,229,0.22);
+}
+
+.card button.danger {
+  background: var(--red-light);
+  color: var(--red);
+}
+
+.card button.danger:hover {
+  background: var(--red);
+  color: white;
+}
+
+.card button.success {
+  background: var(--green-light);
+  color: var(--green);
+}
+
+.card button.success:hover {
+  background: var(--green);
+  color: white;
+}
+
+.card a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 16px 4px;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 13.5px;
+  background: var(--primary-light);
+  padding: 7px 14px;
+  border-radius: 7px;
+  transition: var(--trans);
+}
+
+.card a:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.card.clickable { cursor: pointer; }
+
+.card.clickable:hover h3 { color: var(--primary); }
+
+/* ══════════════════════════════════════════════
+   CATEGORY CARDS (Content type selection)
+══════════════════════════════════════════════ */
+.category-card {
+  text-align: center;
+  padding: 36px 16px !important;
+  cursor: pointer;
+  border: 1.5px solid var(--border) !important;
+  transition: var(--trans) !important;
+}
+
+.category-card:hover {
+  border-color: var(--primary) !important;
+  background: var(--primary-light) !important;
+}
+
+.category-card:hover h3 { color: var(--primary) !important; }
+
+.category-card .icon {
+  font-size: 46px;
+  margin-bottom: 12px;
+  display: block;
+  line-height: 1;
+}
+
+.category-card h3 {
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 15px !important;
+  color: var(--text) !important;
+}
+
+/* ══════════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════════ */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(26,29,59,0.55);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal.active { display: flex; animation: fadeIn .18s ease; }
+
+.modal-content {
+  background: var(--white);
+  padding: 36px 32px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 60px rgba(26,29,59,0.20);
+  border: 1.5px solid var(--border);
+  animation: modalUp .22s cubic-bezier(.4,0,.2,1);
+  position: relative;
+}
+
+@keyframes modalUp {
+  from { transform: translateY(18px) scale(0.97); opacity:0; }
+  to   { transform: translateY(0)     scale(1);    opacity:1; }
+}
+
+.modal-content h2 {
+  margin-bottom: 22px;
+  color: var(--text);
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  padding-right: 32px;
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+  width: 100%;
+  padding: 11px 14px;
+  margin: 7px 0;
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  font-size: 14px;
+  font-family: 'Nunito', sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  transition: var(--trans);
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus,
+.modal-content select:focus {
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(79,70,229,0.08);
+}
+
+.modal-content input::placeholder,
+.modal-content textarea::placeholder { color: var(--text3); }
+
+.modal-content textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.modal-content input[type="file"] {
+  padding: 9px 12px;
+  cursor: pointer;
+  background: var(--bg2);
+  border-style: dashed;
+}
+
+.modal-content button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 12px 26px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-mid));
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+  margin-top: 14px;
+  transition: var(--trans);
+  box-shadow: 0 4px 14px rgba(79,70,229,0.22);
+}
+
+.modal-content button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(79,70,229,0.30);
+}
+
+.modal-content label {
+  display: block;
+  margin-top: 14px;
+  margin-bottom: 2px;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text2);
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+}
+
+.close {
+  position: absolute;
+  top: 18px; right: 20px;
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--text2);
+  line-height: 1;
+  transition: var(--trans);
+  float: none;
+}
+
+.close:hover {
+  background: var(--red-light);
+  border-color: rgba(239,68,68,0.3);
+  color: var(--red);
+}
+
+/* Checkbox list */
+.checkbox-list {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1.5px solid var(--border);
+  padding: 8px 12px;
+  border-radius: 9px;
+  background: var(--bg);
+  margin-top: 6px;
+}
+
+.checkbox-list label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  cursor: pointer;
+  color: var(--text) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  border-bottom: 1px solid var(--border);
+  margin: 0 !important;
+}
+
+.checkbox-list label:last-child { border-bottom: none; }
+.checkbox-list input[type="checkbox"] {
+  accent-color: var(--primary);
+  width: 16px; height: 16px;
+  flex-shrink: 0;
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+/* ══════════════════════════════════════════════
+   STUDENT PANEL
+══════════════════════════════════════════════ */
+#studentPanel .content-area {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .admin-container { flex-direction: column; }
+
+  .sidebar {
+    width: 100%;
+    min-height: auto;
+    display: flex;
+    gap: 6px;
+    padding: 12px;
+    overflow-x: auto;
+  }
+
+  .sidebar button {
+    flex: 1;
+    flex-shrink: 0;
+    margin-bottom: 0;
+    justify-content: center;
+  }
+
+  .content-area { padding: 18px 14px; }
+  .card-grid { grid-template-columns: 1fr; }
+  .login-container { padding: 32px 22px; }
+  .modal-content { padding: 26px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     LOGIN PAGE
+══════════════════════════════════════════════ -->
+<div id="loginPage">
+  <div class="login-container">
+    <h1>
+      <div class="login-logo-ring">🎓</div>
+      EduPeak Coaching
+    </h1>
+
+    <div class="login-tabs">
+      <button class="tab-btn active" onclick="showTab('admin', event)">🛠️ Admin Login</button>
+      <button class="tab-btn" onclick="showTab('student', event)">👨‍🎓 Student Login</button>
+    </div>
+
+    <div id="adminTab" class="login-form active">
+      <h2 style="margin-bottom:15px;color:#1A1D3B;">Admin Login</h2>
+      <input type="email" id="adminEmail" placeholder="Email address">
+      <input type="password" id="adminPassword" placeholder="Password">
+      <button onclick="adminLogin()">Sign in as Admin →</button>
+    </div>
+
+    <div id="studentTab" class="login-form">
+      <h2 style="margin-bottom:15px;color:#1A1D3B;">Student Login</h2>
+      <input type="text" id="studentLoginId" placeholder="Student ID">
+      <input type="password" id="studentLoginPassword" placeholder="Password">
+      <button onclick="studentLogin()">Sign in as Student →</button>
+    </div>
+
+    <p id="errorMsg" class="error"></p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     ADMIN PANEL
+══════════════════════════════════════════════ -->
+<div id="adminPanel" class="hidden">
+  <nav class="navbar">
+    <h2>🛠️ Admin Panel</h2>
+    <button onclick="logout()">Sign Out</button>
+  </nav>
+  <div class="admin-container">
+    <div class="sidebar">
+      <button id="navBatches" class="active" onclick="showAdminSection('batches', event)">📦 Batches</button>
+      <button id="navStudents" onclick="showAdminSection('students', event)">👨‍🎓 Students</button>
+    </div>
+    <div class="content-area">
+      <div id="batchesSection" class="section active">
+        <div id="batchesView"></div>
+      </div>
+      <div id="studentsSection" class="section">
+        <h2>👨‍🎓 Manage Students</h2>
+        <button class="add-btn" onclick="openStudentModal()">+ Add New Student</button>
+        <div id="studentList" class="card-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     STUDENT PANEL
+══════════════════════════════════════════════ -->
+<div id="studentPanel" class="hidden">
+  <nav class="navbar">
+    <h2>🎓 Welcome, <span id="studentNameDisplay"></span></h2>
+    <button onclick="logout()">Sign Out</button>
+  </nav>
+  <div class="content-area">
+    <div id="studentView"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     BATCH MODAL
+══════════════════════════════════════════════ -->
+<div id="batchModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('batchModal')">✕</span>
+    <h2 id="batchModalTitle">Add Batch</h2>
+    <label>Batch Name</label>
+    <input type="text" id="batchName" placeholder="e.g. Class 12 Physics">
+    <label>Batch Photo URL</label>
+    <input type="text" id="batchPhotoUrl" placeholder="https://...">
+    <label>OR Upload Photo</label>
+    <input type="file" id="batchPhotoFile" accept="image/*">
+    <label>Description</label>
+    <textarea id="batchDesc" placeholder="Batch description..."></textarea>
+    <button onclick="saveBatch()">💾 Save Batch</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SUBJECT MODAL
+══════════════════════════════════════════════ -->
+<div id="subjectModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('subjectModal')">✕</span>
+    <h2 id="subjectModalTitle">Add Subject</h2>
+    <label>Subject Name</label>
+    <input type="text" id="subjectName" placeholder="e.g. Physics">
+    <label>Subject Photo URL</label>
+    <input type="text" id="subjectPhotoUrl" placeholder="https://...">
+    <label>OR Upload Photo</label>
+    <input type="file" id="subjectPhotoFile" accept="image/*">
+    <button onclick="saveSubject()">💾 Save Subject</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     CONTENT MODAL
+══════════════════════════════════════════════ -->
+<div id="contentModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('contentModal')">✕</span>
+    <h2 id="contentModalTitle">Add Content</h2>
+    <label>Title</label>
+    <input type="text" id="contentTitle" placeholder="e.g. Lecture 1 - Introduction">
+    <label>Content URL (Video/PDF link)</label>
+    <input type="text" id="contentUrl" placeholder="YouTube / Drive / Direct link">
+    <label>OR Upload File</label>
+    <input type="file" id="contentFile">
+    <button onclick="saveContent()">💾 Save Content</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     STUDENT MODAL
+══════════════════════════════════════════════ -->
+<div id="studentModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('studentModal')">✕</span>
+    <h2 id="studentModalTitle">Add Student</h2>
+    <label>Student ID (unique)</label>
+    <input type="text" id="newStudentId" placeholder="e.g. STU001">
+    <label>Student Name</label>
+    <input type="text" id="newStudentName" placeholder="Full Name">
+    <label>Password</label>
+    <input type="text" id="newStudentPassword" placeholder="Password">
+    <label>Assign Batches</label>
+    <div id="batchCheckboxes" class="checkbox-list"></div>
+    <button onclick="saveStudent()">💾 Save Student</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     JAVASCRIPT — EXACTLY SAME AS ORIGINAL
+══════════════════════════════════════════════ -->
+<script>
+// ============================================
+// DATA STORAGE - Using LocalStorage
+// ============================================
+const ADMIN_EMAIL = "virendrajangid081@gmail.com";
+const ADMIN_PASSWORD = "Edith@9.6";
+
+function getData() {
+  return {
+    batches: JSON.parse(localStorage.getItem('batches') || '{}'),
+    students: JSON.parse(localStorage.getItem('students') || '{}')
+  };
+}
+function saveBatches(b) { localStorage.setItem('batches', JSON.stringify(b)); }
+function saveStudents(s) { localStorage.setItem('students', JSON.stringify(s)); }
+
+// ============================================
+// LOGIN SYSTEM
+// ============================================
+function showTab(tab, evt) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.login-form').forEach(f => f.classList.remove('active'));
+  evt.target.classList.add('active');
+  document.getElementById(tab + 'Tab').classList.add('active');
+  document.getElementById('errorMsg').textContent = '';
+}
+
+function adminLogin() {
+  const email = document.getElementById('adminEmail').value;
+  const password = document.getElementById('adminPassword').value;
+  if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+    sessionStorage.setItem('userType', 'admin');
+    showAdminPanel();
+  } else {
+    document.getElementById('errorMsg').textContent = '❌ Invalid admin credentials!';
+  }
+}
+
+function studentLogin() {
+  const id = document.getElementById('studentLoginId').value;
+  const password = document.getElementById('studentLoginPassword').value;
+  const data = getData();
+  if (data.students[id] && data.students[id].password === password) {
+    sessionStorage.setItem('userType', 'student');
+    sessionStorage.setItem('studentId', id);
+    showStudentPanel();
+  } else {
+    document.getElementById('errorMsg').textContent = '❌ Invalid student credentials!';
+  }
+}
+
+function logout() {
+  sessionStorage.clear();
+  document.getElementById('loginPage').classList.remove('hidden');
+  document.getElementById('adminPanel').classList.add('hidden');
+  document.getElementById('studentPanel').classList.add('hidden');
+  document.getElementById('adminEmail').value = '';
+  document.getElementById('adminPassword').value = '';
+  document.getElementById('studentLoginId').value = '';
+  document.getElementById('studentLoginPassword').value = '';
+}
+
+function showAdminPanel() {
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('adminPanel').classList.remove('hidden');
+  loadBatches();
+}
+
+function showStudentPanel() {
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('studentPanel').classList.remove('hidden');
+  const id = sessionStorage.getItem('studentId');
+  const data = getData();
+  document.getElementById('studentNameDisplay').textContent = data.students[id].name;
+  showStudentBatches();
+}
+
+// ============================================
+// MODAL HELPERS
+// ============================================
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// ============================================
+// ADMIN - SECTIONS
+// ============================================
+function showAdminSection(section, evt) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sidebar button').forEach(b => b.classList.remove('active'));
+  document.getElementById(section + 'Section').classList.add('active');
+  evt.target.classList.add('active');
+  if (section === 'batches') loadBatches();
+  if (section === 'students') loadStudents();
+}
+
+// ============================================
+// BATCHES MANAGEMENT
+// ============================================
+let editingBatchId = null;
+
+function loadBatches() {
+  const data = getData();
+  let html = `<h2>📦 Manage Batches</h2>
+    <button class="add-btn" onclick="openBatchModal()">+ Add New Batch</button>
+    <div class="card-grid">`;
+  
+  const batchKeys = Object.keys(data.batches);
+  if (batchKeys.length === 0) {
+    html += '<p style="color:#9BA3C7;">No batches yet. Click "Add New Batch" to start.</p>';
+  }
+  
+  batchKeys.forEach(id => {
+    const b = data.batches[id];
+    html += `<div class="card">
+      <img src="${b.photoUrl || 'https://via.placeholder.com/250x150?text=Batch'}" alt="">
+      <h3>${b.name}</h3>
+      <p>${b.description || ''}</p>
+      <button onclick="manageSubjects('${id}')">📚 Subjects</button>
+      <button onclick="openBatchModal('${id}')">✏️ Edit</button>
+      <button class="danger" onclick="deleteBatch('${id}')">🗑️ Delete</button>
+    </div>`;
+  });
+  html += '</div>';
+  document.getElementById('batchesView').innerHTML = html;
+}
+
+function openBatchModal(batchId = null) {
+  editingBatchId = batchId;
+  document.getElementById('batchModalTitle').textContent = batchId ? 'Edit Batch' : 'Add Batch';
+  document.getElementById('batchPhotoFile').value = '';
+  if (batchId) {
+    const data = getData();
+    const b = data.batches[batchId];
+    document.getElementById('batchName').value = b.name;
+    document.getElementById('batchPhotoUrl').value = b.photoUrl || '';
+    document.getElementById('batchDesc').value = b.description || '';
+  } else {
+    document.getElementById('batchName').value = '';
+    document.getElementById('batchPhotoUrl').value = '';
+    document.getElementById('batchDesc').value = '';
+  }
+  openModal('batchModal');
+}
+
+async function saveBatch() {
+  const name = document.getElementById('batchName').value.trim();
+  if (!name) { alert('Please enter batch name'); return; }
+  
+  let photoUrl = document.getElementById('batchPhotoUrl').value;
+  const file = document.getElementById('batchPhotoFile').files[0];
+  if (file) photoUrl = await fileToBase64(file);
+  
+  const description = document.getElementById('batchDesc').value;
+  const data = getData();
+  const id = editingBatchId || 'batch_' + Date.now();
+  
+  data.batches[id] = {
+    name, photoUrl, description,
+    subjects: data.batches[id]?.subjects || {}
+  };
+  saveBatches(data.batches);
+  closeModal('batchModal');
+  loadBatches();
+}
+
+function deleteBatch(id) {
+  if (!confirm('Delete this batch and all its content?')) return;
+  const data = getData();
+  delete data.batches[id];
+  saveBatches(data.batches);
+  loadBatches();
+}
+
+// ============================================
+// SUBJECTS MANAGEMENT
+// ============================================
+let currentBatchId = null;
+let editingSubjectId = null;
+
+function manageSubjects(batchId) {
+  currentBatchId = batchId;
+  const data = getData();
+  const batch = data.batches[batchId];
+  const subjects = batch.subjects || {};
+  
+  let html = `<h2>
+    <button class="back-btn" onclick="loadBatches()">← Back</button>
+    ${batch.name} - Subjects
+  </h2>
+  <button class="add-btn" onclick="openSubjectModal()">+ Add Subject</button>
+  <div class="card-grid">`;
+  
+  const subKeys = Object.keys(subjects);
+  if (subKeys.length === 0) html += '<p style="color:#9BA3C7;">No subjects yet.</p>';
+  
+  subKeys.forEach(id => {
+    const s = subjects[id];
+    html += `<div class="card">
+      <img src="${s.photoUrl || 'https://via.placeholder.com/250x150?text=Subject'}" alt="">
+      <h3>${s.name}</h3>
+      <button onclick="manageContent('${id}')">📁 Content</button>
+      <button onclick="openSubjectModal('${id}')">✏️ Edit</button>
+      <button class="danger" onclick="deleteSubject('${id}')">🗑️ Delete</button>
+    </div>`;
+  });
+  html += '</div>';
+  document.getElementById('batchesView').innerHTML = html;
+}
+
+function openSubjectModal(subjectId = null) {
+  editingSubjectId = subjectId;
+  document.getElementById('subjectModalTitle').textContent = subjectId ? 'Edit Subject' : 'Add Subject';
+  document.getElementById('subjectPhotoFile').value = '';
+  if (subjectId) {
+    const data = getData();
+    const s = data.batches[currentBatchId].subjects[subjectId];
+    document.getElementById('subjectName').value = s.name;
+    document.getElementById('subjectPhotoUrl').value = s.photoUrl || '';
+  } else {
+    document.getElementById('subjectName').value = '';
+    document.getElementById('subjectPhotoUrl').value = '';
+  }
+  openModal('subjectModal');
+}
+
+async function saveSubject() {
+  const name = document.getElementById('subjectName').value.trim();
+  if (!name) { alert('Please enter subject name'); return; }
+  
+  let photoUrl = document.getElementById('subjectPhotoUrl').value;
+  const file = document.getElementById('subjectPhotoFile').files[0];
+  if (file) photoUrl = await fileToBase64(file);
+  
+  const data = getData();
+  if (!data.batches[currentBatchId].subjects) data.batches[currentBatchId].subjects = {};
+  
+  const id = editingSubjectId || 'sub_' + Date.now();
+  const existing = data.batches[currentBatchId].subjects[id] || {};
+  
+  data.batches[currentBatchId].subjects[id] = {
+    name, photoUrl,
+    content: existing.content || { video: {}, pdf: {}, notes: {}, dpp: {}, dppVideo: {} }
+  };
+  saveBatches(data.batches);
+  closeModal('subjectModal');
+  manageSubjects(currentBatchId);
+}
+
+function deleteSubject(id) {
+  if (!confirm('Delete this subject?')) return;
+  const data = getData();
+  delete data.batches[currentBatchId].subjects[id];
+  saveBatches(data.batches);
+  manageSubjects(currentBatchId);
+}
+
+// ============================================
+// CONTENT CATEGORIES (Video, PDF, Notes, DPP, DPP Video)
+// ============================================
+let currentSubjectId = null;
+let currentContentType = null;
+let editingContentId = null;
+
+function manageContent(subjectId) {
+  currentSubjectId = subjectId;
+  const data = getData();
+  const subject = data.batches[currentBatchId].subjects[subjectId];
+  
+  const html = `<h2>
+    <button class="back-btn" onclick="manageSubjects('${currentBatchId}')">← Back</button>
+    ${subject.name} - Content
+  </h2>
+  <div class="card-grid">
+    <div class="card category-card" onclick="manageContentType('video')">
+      <div class="icon">🎬</div><h3>Videos</h3>
+    </div>
+    <div class="card category-card" onclick="manageContentType('pdf')">
+      <div class="icon">📄</div><h3>PDFs</h3>
+    </div>
+    <div class="card category-card" onclick="manageContentType('notes')">
+      <div class="icon">📝</div><h3>Notes</h3>
+    </div>
+    <div class="card category-card" onclick="manageContentType('dpp')">
+      <div class="icon">📋</div><h3>DPP</h3>
+    </div>
+    <div class="card category-card" onclick="manageContentType('dppVideo')">
+      <div class="icon">🎥</div><h3>DPP Videos</h3>
+    </div>
+  </div>`;
+  document.getElementById('batchesView').innerHTML = html;
+}
+
+function manageContentType(type) {
+  currentContentType = type;
+  const data = getData();
+  const subject = data.batches[currentBatchId].subjects[currentSubjectId];
+  if (!subject.content) subject.content = { video: {}, pdf: {}, notes: {}, dpp: {}, dppVideo: {} };
+  if (!subject.content[type]) subject.content[type] = {};
+  
+  const items = subject.content[type];
+  const labels = { video: 'Videos', pdf: 'PDFs', notes: 'Notes', dpp: 'DPP', dppVideo: 'DPP Videos' };
+  
+  let html = `<h2>
+    <button class="back-btn" onclick="manageContent('${currentSubjectId}')">← Back</button>
+    ${labels[type]}
+  </h2>
+  <button class="add-btn" onclick="openContentModal()">+ Add ${labels[type].slice(0,-1)}</button>
+  <div class="card-grid">`;
+  
+  const keys = Object.keys(items);
+  if (keys.length === 0) html += '<p style="color:#9BA3C7;">No items yet.</p>';
+  
+  keys.forEach(id => {
+    const c = items[id];
+    html += `<div class="card">
+      <h3>${c.title}</h3>
+      <a href="${c.url}" target="_blank">🔗 Open Link</a><br>
+      <button onclick="openContentModal('${id}')">✏️ Edit</button>
+      <button class="danger" onclick="deleteContent('${id}')">🗑️ Delete</button>
+    </div>`;
+  });
+  html += '</div>';
+  document.getElementById('batchesView').innerHTML = html;
+}
+
+function openContentModal(contentId = null) {
+  editingContentId = contentId;
+  const labels = { video: 'Video', pdf: 'PDF', notes: 'Note', dpp: 'DPP', dppVideo: 'DPP Video' };
+  document.getElementById('contentModalTitle').textContent = (contentId ? 'Edit ' : 'Add ') + labels[currentContentType];
+  document.getElementById('contentFile').value = '';
+  
+  if (contentId) {
+    const data = getData();
+    const c = data.batches[currentBatchId].subjects[currentSubjectId].content[currentContentType][contentId];
+    document.getElementById('contentTitle').value = c.title;
+    document.getElementById('contentUrl').value = c.url;
+  } else {
+    document.getElementById('contentTitle').value = '';
+    document.getElementById('contentUrl').value = '';
+  }
+  openModal('contentModal');
+}
+
+async function saveContent() {
+  const title = document.getElementById('contentTitle').value.trim();
+  if (!title) { alert('Please enter title'); return; }
+  
+  let url = document.getElementById('contentUrl').value;
+  const file = document.getElementById('contentFile').files[0];
+  if (file) url = await fileToBase64(file);
+  if (!url) { alert('Please provide URL or upload file'); return; }
+  
+  const data = getData();
+  const subject = data.batches[currentBatchId].subjects[currentSubjectId];
+  if (!subject.content) subject.content = { video: {}, pdf: {}, notes: {}, dpp: {}, dppVideo: {} };
+  if (!subject.content[currentContentType]) subject.content[currentContentType] = {};
+  
+  const id = editingContentId || 'cnt_' + Date.now();
+  subject.content[currentContentType][id] = { title, url };
+  saveBatches(data.batches);
+  closeModal('contentModal');
+  manageContentType(currentContentType);
+}
+
+function deleteContent(id) {
+  if (!confirm('Delete this item?')) return;
+  const data = getData();
+  delete data.batches[currentBatchId].subjects[currentSubjectId].content[currentContentType][id];
+  saveBatches(data.batches);
+  manageContentType(currentContentType);
+}
+
+// ============================================
+// STUDENTS MANAGEMENT
+// ============================================
+let editingStudentId = null;
+
+function loadStudents() {
+  const data = getData();
+  const list = document.getElementById('studentList');
+  list.innerHTML = '';
+  
+  const keys = Object.keys(data.students);
+  if (keys.length === 0) {
+    list.innerHTML = '<p style="color:#9BA3C7;">No students yet. Click "Add New Student" to start.</p>';
+    return;
+  }
+  
+  keys.forEach(id => {
+    const s = data.students[id];
+    const batchNames = (s.batches || []).map(bid => data.batches[bid]?.name || 'Deleted').join(', ');
+    list.innerHTML += `<div class="card">
+      <h3>${s.name}</h3>
+      <p><b>ID:</b> ${id}</p>
+      <p><b>Password:</b> ${s.password}</p>
+      <p><b>Batches:</b> ${batchNames || 'None'}</p>
+      <button onclick="openStudentModal('${id}')">✏️ Edit</button>
+      <button class="danger" onclick="deleteStudent('${id}')">🗑️ Remove</button>
+    </div>`;
+  });
+}
+
+function openStudentModal(studentId = null) {
+  editingStudentId = studentId;
+  document.getElementById('studentModalTitle').textContent = studentId ? 'Edit Student' : 'Add Student';
+  const data = getData();
+  
+  let assignedBatches = [];
+  if (studentId) {
+    const s = data.students[studentId];
+    document.getElementById('newStudentId').value = studentId;
+    document.getElementById('newStudentId').disabled = true;
+    document.getElementById('newStudentName').value = s.name;
+    document.getElementById('newStudentPassword').value = s.password;
+    assignedBatches = s.batches || [];
+  } else {
+    document.getElementById('newStudentId').value = '';
+    document.getElementById('newStudentId').disabled = false;
+    document.getElementById('newStudentName').value = '';
+    document.getElementById('newStudentPassword').value = '';
+  }
+  
+  let html = '';
+  const batchKeys = Object.keys(data.batches);
+  if (batchKeys.length === 0) {
+    html = '<p style="color:#9BA3C7;">No batches available. Add batches first.</p>';
+  } else {
+    batchKeys.forEach(bid => {
+      const checked = assignedBatches.includes(bid) ? 'checked' : '';
+      html += `<label><input type="checkbox" value="${bid}" ${checked}> ${data.batches[bid].name}</label>`;
+    });
+  }
+  document.getElementById('batchCheckboxes').innerHTML = html;
+  openModal('studentModal');
+}
+
+function saveStudent() {
+  const id = document.getElementById('newStudentId').value.trim();
+  const name = document.getElementById('newStudentName').value.trim();
+  const password = document.getElementById('newStudentPassword').value.trim();
+  
+  if (!id || !name || !password) { alert('Please fill all fields'); return; }
+  
+  const data = getData();
+  if (!editingStudentId && data.students[id]) {
+    alert('Student ID already exists!'); return;
+  }
+  
+  const batches = [...document.querySelectorAll('#batchCheckboxes input:checked')].map(c => c.value);
+  data.students[id] = { name, password, batches };
+  saveStudents(data.students);
+  closeModal('studentModal');
+  loadStudents();
+}
+
+function deleteStudent(id) {
+  if (!confirm('Remove this student?')) return;
+  const data = getData();
+  delete data.students[id];
+  saveStudents(data.students);
+  loadStudents();
+}
+
+// ============================================
+// STUDENT VIEW
+// ============================================
+function showStudentBatches() {
+  const id = sessionStorage.getItem('studentId');
+  const data = getData();
+  const student = data.students[id];
+  
+  let html = `<h2>📚 Your Batches</h2><div class="card-grid">`;
+  
+  if (!student.batches || student.batches.length === 0) {
+    html += '<p style="color:#9BA3C7;">No batches assigned. Contact admin.</p>';
+  }
+  
+  (student.batches || []).forEach(bid => {
+    const b = data.batches[bid];
+    if (b) {
+      html += `<div class="card clickable" onclick="studentViewSubjects('${bid}')">
+        <img src="${b.photoUrl || 'https://via.placeholder.com/250x150?text=Batch'}" alt="">
+        <h3>${b.name}</h3>
+        <p>${b.description || ''}</p>
+      </div>`;
+    }
+  });
+  html += '</div>';
+  document.getElementById('studentView').innerHTML = html;
+}
+
+function studentViewSubjects(batchId) {
+  const data = getData();
+  const batch = data.batches[batchId];
+  const subjects = batch.subjects || {};
+  
+  let html = `<h2>
+    <button class="back-btn" onclick="showStudentBatches()">← Back</button>
+    ${batch.name}
+  </h2><div class="card-grid">`;
+  
+  const keys = Object.keys(subjects);
+  if (keys.length === 0) html += '<p style="color:#9BA3C7;">No subjects yet.</p>';
+  
+  keys.forEach(sid => {
+    const s = subjects[sid];
+    html += `<div class="card clickable" onclick="studentViewCategories('${batchId}','${sid}')">
+      <img src="${s.photoUrl || 'https://via.placeholder.com/250x150?text=Subject'}" alt="">
+      <h3>${s.name}</h3>
+    </div>`;
+  });
+  html += '</div>';
+  document.getElementById('studentView').innerHTML = html;
+}
+
+function studentViewCategories(batchId, subjectId) {
+  const data = getData();
+  const subject = data.batches[batchId].subjects[subjectId];
+  
+  const html = `<h2>
+    <button class="back-btn" onclick="studentViewSubjects('${batchId}')">← Back</button>
+    ${subject.name}
+  </h2>
+  <div class="card-grid">
+    <div class="card category-card" onclick="studentViewContent('${batchId}','${subjectId}','video')">
+      <div class="icon">🎬</div><h3>Videos</h3>
+    </div>
+    <div class="card category-card" onclick="studentViewContent('${batchId}','${subjectId}','pdf')">
+      <div class="icon">📄</div><h3>PDFs</h3>
+    </div>
+    <div class="card category-card" onclick="studentViewContent('${batchId}','${subjectId}','notes')">
+      <div class="icon">📝</div><h3>Notes</h3>
+    </div>
+    <div class="card category-card" onclick="studentViewContent('${batchId}','${subjectId}','dpp')">
+      <div class="icon">📋</div><h3>DPP</h3>
+    </div>
+    <div class="card category-card" onclick="studentViewContent('${batchId}','${subjectId}','dppVideo')">
+      <div class="icon">🎥</div><h3>DPP Videos</h3>
+    </div>
+  </div>`;
+  document.getElementById('studentView').innerHTML = html;
+}
+
+function studentViewContent(batchId, subjectId, type) {
+  const data = getData();
+  const subject = data.batches[batchId].subjects[subjectId];
+  const items = subject.content?.[type] || {};
+  const labels = { video: 'Videos', pdf: 'PDFs', notes: 'Notes', dpp: 'DPP', dppVideo: 'DPP Videos' };
+  
+  let html = `<h2>
+    <button class="back-btn" onclick="studentViewCategories('${batchId}','${subjectId}')">← Back</button>
+    ${subject.name} - ${labels[type]}
+  </h2><div class="card-grid">`;
+  
+  const keys = Object.keys(items);
+  if (keys.length === 0) html += '<p style="color:#9BA3C7;">No content yet.</p>';
+  
+  keys.forEach(cid => {
+    const c = items[cid];
+    html += `<div class="card">
+      <h3>${c.title}</h3>
+      <a href="${c.url}" target="_blank">▶️ Open / Watch</a>
+    </div>`;
+  });
+  html += '</div>';
+  document.getElementById('studentView').innerHTML = html;
+}
+
+// ============================================
+// AUTO-LOGIN ON RELOAD
+// ============================================
+window.onload = function() {
+  const userType = sessionStorage.getItem('userType');
+  if (userType === 'admin') showAdminPanel();
+  else if (userType === 'student') showStudentPanel();
+};
+</script>
+</body>
+</html>
